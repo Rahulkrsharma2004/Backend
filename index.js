@@ -15,10 +15,14 @@ const PORT = process.env.PORT
 
 app.use(express.json())
 app.use(cors({
-    origin:"",
+    origin:["http://localhost:5173","https://full-stack-backend-beyu.onrender.com","https://form-crud-app01.netlify.app"],
     credentials:true,
 }))
-app.use(cookieParser());
+app.use(cookieParser({
+    httpOnly:true,
+    secure:true,
+    sameSite:"none"
+}));
 app.use("/users", authRouter)
 app.use("/product", productRouter)
 
