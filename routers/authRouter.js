@@ -18,6 +18,17 @@ authRouter.post("/register", async (req, res) => {
     const { username, email, pass} = req.body
     console.log(req.body)
     try {
+
+         if (!isValidPassword(pass)) {
+            return res.status(400).json({ error: 'Invalid password format' });
+        }
+ 
+
+        const existingUser = await UserModel.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({ error: 'User with this email already exists' });
+        }
+
         bcrypt.hash(pass, 5, async function (err, hash) {
             if (err) {
                 res.send({ "msg": err })
@@ -64,7 +75,10 @@ authRouter.post("/login", async (req, res) => {
     }
 })
 
-
+const isValidPassword = (pass) => {
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    return passwordRegex.test(pass);
+};
 
 module.exports = {
     authRouter
