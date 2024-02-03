@@ -31,14 +31,12 @@ app.get("/", (req, res) => {
 })
 
 
-app.get("/logout", auth , async (req, res) => {
-    try {
-        
+app.post("/logout", auth , async (req, res) => {
+    try {   
         const token = req.cookies.ACCESS_TOKEN
         const blacklistToken = new BlacklistToken({token})
         await blacklistToken.save()
         res.status(200).send("Logout Successfully")
-
     } catch (error) {
         res.status(500).json({ message: 'Internal Server Error' });
     }
