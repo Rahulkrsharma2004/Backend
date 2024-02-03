@@ -22,9 +22,10 @@ const auth = async (req, res, next) => {
     
             } else {
                 jwt.verify(refresh_token, refresh_secretKey, (err, decode) => {
+                    const cookieOptions={httpOnly:true,secure:true,sameSite:"none"}
                     if (decode) {
                         const token = jwt.sign({userID:decode._id,user:decode.username}, access_secretKey, { expiresIn: "1h" })
-                        res.cookie("ACCESS_TOKEN", token)
+                        res.cookie("ACCESS_TOKEN", token,cookieOptions)
                         next()
                     } else {
                         res.status(400).send({ "msg": "Now you need to login again" })

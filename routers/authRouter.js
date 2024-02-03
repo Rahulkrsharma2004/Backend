@@ -20,13 +20,13 @@ authRouter.post("/register", async (req, res) => {
     try {
 
          if (!isValidPassword(pass)) {
-            return res.status(400).json({ error: 'Invalid password format' });
+            return res.status(200).json({ error: 'Invalid password format' });
         }
  
 
         const existingUser = await UserModel.findOne({ email });
         if (existingUser) {
-            return res.status(400).json({ error: 'User with this email already exists' });
+            return res.status(200).json({ error: 'User with this email already exists' });
         }
 
         bcrypt.hash(pass, 5, async function (err, hash) {
@@ -47,7 +47,7 @@ authRouter.post("/register", async (req, res) => {
 
 authRouter.post("/login", async (req, res) => {
     const { email, pass } = req.body
-
+    const cookieOptions={httpOnly:true,secure:true,sameSite:"none"}
     try {
         const user = await UserModel.findOne({ email })
         console.log(user)
@@ -56,8 +56,8 @@ authRouter.post("/login", async (req, res) => {
                 if (result) {
                     const token = jwt.sign({userID:user._id,user:user.username}, access_secretKey ,{expiresIn:"1h"});
                     const refresh_token = jwt.sign({userID:user._id,user:user.username}, refresh_secretKey ,{expiresIn:"7d"});
-                    res.cookie("ACCESS_TOKEN",token)
-                    res.cookie("REFRESH_TOKEN",refresh_token)
+                    res.cookie("ACCESS_TOKEN",token,cookieOptions)
+                    res.cookie("REFRESH_TOKEN",refresh_token,cookieOptions)
                     res.status(200).send({ "msg": "Login Successful","token":token})
                     
                 } else {
